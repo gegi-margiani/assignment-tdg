@@ -4,8 +4,6 @@ const router = require('koa-router')({ prefix: '/people' });
 
 router.get('/', people.getPeople);
 
-router.get('/person/:id', people.getPerson);
-
 router.delete('/person/:id', people.deletePerson);
 
 router.post('/person', validate, people.postPerson);

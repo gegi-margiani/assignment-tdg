@@ -13,30 +13,6 @@ exports.getPeople = (ctx, next) => {
   }
 };
 
-exports.getPerson = (ctx, next) => {
-  try {
-    const id = ctx.params.id;
-    if (!id || typeof +id !== 'number') {
-      ctx.status = 400;
-      ctx.body = 'id must be a number';
-      return;
-    }
-    const people = JSON.parse(
-      fs.readFileSync(path.join(__dirname, '../db.json'), 'utf8')
-    );
-    const indexOfPerson = people.findIndex((person) => person.id === +id);
-    if (indexOfPerson === -1) {
-      ctx.status = 404;
-      ctx.body = 'Person not found';
-      return;
-    }
-    ctx.body = people[indexOfPerson];
-  } catch (error) {
-    console.log(error);
-    ctx.status = 500;
-  }
-};
-
 exports.deletePerson = (ctx, next) => {
   try {
     const id = ctx.params.id;
@@ -60,7 +36,7 @@ exports.deletePerson = (ctx, next) => {
       JSON.stringify(people)
     );
     ctx.status = 200;
-    ctx.body = people;
+    ctx.body = 'Person deleted';
   } catch (error) {
     console.log(error);
     ctx.status = 500;
@@ -114,7 +90,7 @@ exports.putPerson = (ctx, next) => {
       JSON.stringify(people)
     );
     ctx.status = 200;
-    ctx.body = people;
+    ctx.body = 'Person updated';
   } catch (error) {
     console.log(error);
     ctx.status = 500;
