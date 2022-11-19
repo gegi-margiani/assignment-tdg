@@ -82,7 +82,7 @@ function Table() {
   const toggle = () => setIsModalOpen(!isModalOpen);
 
   return (
-    <div style={{ userSelect: 'none' }}>
+    <div>
       <DataTable
         title="People Info List"
         columns={columns}
