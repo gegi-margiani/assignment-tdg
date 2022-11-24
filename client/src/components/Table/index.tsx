@@ -1,6 +1,7 @@
+import { Col, Row, Table as DataTable } from 'antd';
+import type { ColumnsType } from 'antd/es/table';
 import axios from 'axios';
 import { useEffect, useState } from 'react';
-import DataTable, { TableColumn } from 'react-data-table-component';
 import { usePeopleStore } from '../../stores/people';
 import { Person } from '../../types/people';
 import Modal from '../Modal';
@@ -19,56 +20,80 @@ function Table() {
   const people = usePeopleStore((state) => state.people);
   const removePerson = usePeopleStore((state) => state.removePerson);
 
-  const columns: TableColumn<Person>[] = [
+  const columns: ColumnsType<Person> = [
     {
-      name: 'Id',
-      selector: (row) => row.id,
-      sortable: true,
+      title: 'Id',
+      dataIndex: 'id',
+      key: 'id',
+      sorter: {
+        compare: (a, b) => a.id - b.id,
+      },
     },
     {
-      name: 'Name',
-      selector: (row) => row.name,
-      sortable: true,
+      title: 'Name',
+      dataIndex: 'name',
+      key: 'name',
+      sorter: {
+        compare: (a, b) => a.name.localeCompare(b.name),
+      },
     },
     {
-      name: 'Email',
-      selector: (row) => row.email,
-      sortable: true,
+      title: 'Email',
+      dataIndex: 'email',
+      key: 'email',
+      sorter: {
+        compare: (a, b) => a.email.localeCompare(b.email),
+      },
     },
     {
-      name: 'Gender',
-      selector: (row) => row.gender,
-      sortable: true,
+      title: 'Gender',
+      dataIndex: 'gender',
+      key: 'gender',
+      sorter: {
+        compare: (a, b) => a.gender.localeCompare(b.gender),
+      },
     },
     {
-      name: 'Street',
-      selector: (row) => row.address.street,
-      sortable: true,
+      title: 'Street',
+      dataIndex: ['address', 'street'],
+      key: 'street',
+      sorter: {
+        compare: (a, b) => a.address.street.localeCompare(b.address.street),
+      },
     },
     {
-      name: 'City',
-      selector: (row) => row.address.city,
-      sortable: true,
+      title: 'City',
+      dataIndex: ['address', 'city'],
+      key: 'city',
+      sorter: {
+        compare: (a, b) => a.address.city.localeCompare(b.address.city),
+      },
     },
     {
-      name: 'Phone',
-      selector: (row) => row.phone,
-      sortable: true,
+      title: 'Phone',
+      dataIndex: 'phone',
+      key: 'phone',
+      sorter: {
+        compare: (a, b) => a.phone.localeCompare(b.phone),
+      },
     },
     {
-      cell: (row) => (
-        <StyledDeleteButton
-          onClick={async (e) => {
-            e.preventDefault();
-            const response = await axios.delete(`/people/person/${row.id}`);
-            if (response.data === 'Person deleted') {
-              removePerson(row);
-            }
-          }}
-        >
-          Delete
-        </StyledDeleteButton>
-      ),
+      key: 'operation',
+      render: (row: any) => {
+        return (
+          <StyledDeleteButton
+            onClick={async (e) => {
+              e.preventDefault();
+              const response = await axios.delete(`/people/person/${row.id}`);
+              if (response.data === 'Person deleted') {
+                removePerson(row);
+              }
+            }}
+          >
+            Delete
+          </StyledDeleteButton>
+        );
+      },
     },
   ];
 
@@ -84,32 +109,46 @@ function Table() {
   return (
     <div>
       <DataTable
-        title="People Info List"
         columns={columns}
-        data={people}
-        pagination
-        highlightOnHover
-        pointerOnHover
-        responsive
-        striped
-        progressPending={pending}
-        onRowDoubleClicked={(row, e) => {
-          setPerson(row);
-          setIsAdd(false);
-          setIsUpdate(true);
-          toggle();
+        dataSource={people}
+        loading={pending}
+        rowKey="id"
+        title={() => {
+          return (
+            <Row>
+              <Col span={22}>
+                <span>People List</span>
+              </Col>
+              <Col span={2} flex="auto">
+                <StyledAddButton
+                  onClick={() => {
+                    setIsAdd(true);
+                    setIsUpdate(false);
+                    toggle();
+                  }}
+                >
+                  Add Person
+                </StyledAddButton>
+              </Col>
+            </Row>
+          );
         }}
-        actions={
-          <StyledAddButton
-            onClick={() => {
-              setIsAdd(true);
-              setIsUpdate(false);
+        onRow={(record, rowIndex) => {
+          return {
+            onDoubleClick: (e) => {
+              setPerson(record);
+              setIsAdd(false);
+              setIsUpdate(true);
               toggle();
-            }}
-          >
-            Add Person
-          </StyledAddButton>
-        }
+            },
+            onMouseEnter: (e) => {
+              document.body.style.cursor = 'pointer';
+            },
+            onMouseLeave: (e) => {
+              document.body.style.cursor = 'default';
+            },
+          };
+        }}
       />
       <Modal
         isOpen={isModalOpen}

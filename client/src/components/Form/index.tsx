@@ -9,9 +9,10 @@ type Props = {
   isAdd: boolean;
   isUpdate: boolean;
   person: Person | any;
+  toggleModal: () => void;
 };
 
-function Form({ isAdd, isUpdate, person }: Props) {
+function Form({ isAdd, isUpdate, person, toggleModal }: Props) {
   const [validationError, setValidationError] = useState('');
 
   const firstNameRef = useRef<HTMLInputElement>(null);
@@ -79,6 +80,7 @@ function Form({ isAdd, isUpdate, person }: Props) {
       const newPerson: Person = response.data;
       if (newPerson) {
         addPerson(newPerson);
+        toggleModal();
       }
     }
   };
@@ -102,6 +104,7 @@ function Form({ isAdd, isUpdate, person }: Props) {
 
       if (response.data === 'Person updated') {
         updatePerson({ id: person.id, ...(body as Omit<Person, 'id'>) });
+        toggleModal();
       }
     }
   };

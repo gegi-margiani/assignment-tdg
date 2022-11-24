@@ -1,37 +1,29 @@
+import { Pie } from '@ant-design/plots';
 import { useEffect, useState } from 'react';
-import ApexChart from 'react-apexcharts';
 import { usePeopleStore } from '../../stores/people';
 import { StyledChartDiv } from './Chart.styled';
 
 type ChartObj = {
-  options: {};
-  series: number[];
+  type: string;
+  value: number;
 };
 
 function Chart() {
-  const [chartState, setChartState] = useState<ChartObj>({
-    options: {
-      chart: {
-        width: 380,
-        type: 'pie',
-      },
-      labels: ['Team A', 'Team B', 'Team C', 'Team D', 'Team E'],
-      responsive: [
-        {
-          breakpoint: 480,
-          options: {
-            chart: {
-              width: 350,
-            },
-            legend: {
-              position: 'bottom',
-            },
-          },
-        },
-      ],
+  const [data, setData] = useState<ChartObj[]>([]);
+  const config = {
+    appendPadding: 10,
+    data: data,
+    angleField: 'value',
+    colorField: 'type',
+    label: {
+      type: 'outer',
     },
-    series: [],
-  });
+    interactions: [
+      {
+        type: 'element-active',
+      },
+    ],
+  };
   const people = usePeopleStore((state) => state.people);
 
   useEffect(() => {
@@ -52,22 +44,18 @@ function Chart() {
       return city;
     });
     const numberOfPeople = Object.keys(citiesObj).map((city) => {
-      return citiesObj[city];
+      return +citiesObj[city];
     });
-    setChartState({
-      series: numberOfPeople,
-      options: { ...chartState.options, labels: listOfCities },
+    const newData = listOfCities.map((city, i) => {
+      return { type: city, value: numberOfPeople[i] };
     });
+    console.log(listOfCities, numberOfPeople);
+    setData([...newData]);
   }, [people]);
 
   return (
     <StyledChartDiv>
-      <ApexChart
-        options={chartState.options}
-        series={chartState.series}
-        type="pie"
-        width={480}
-      />
+      <Pie {...config} />
     </StyledChartDiv>
   );
 }
